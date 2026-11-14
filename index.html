@@ -1,1 +1,356 @@
-<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cancionero San Francisco - Chillan</title><style>body{font-family:system-ui,Arial,sans-serif;margin:0;background:#0b1e3a;color:#fff}header{padding:16px;text-align:center}.wrap{max-width:700px;margin:0 auto;padding:14px}.card{background:#ffffff14;border:1px solid #ffffff33;border-radius:16px;padding:14px;margin:10px 0}.btn{display:block;background:#ffd500;color:#111;text-align:center;padding:14px;border-radius:12px;font-weight:800;text-decoration:none;margin:10px 0}input{width:100%;padding:12px;border-radius:10px;border:none}</style></head><body><header><div>SAN FRANCISCO DE ASIS - CHILLAN</div><h1>Cancionero</h1></header><div class="wrap"><a class="btn" href="rosario.html">IR AL SANTO ROSARIO CON VOZ</a><div class="card"><input id="busc" placeholder="Buscar cancion..." oninput="filtrar()"><div id="lista"></div></div><div class="card" id="detalle"><b>Toca una cancion para ver su letra</b></div></div><script>const canciones=[{t:"Santo, Santo, Santo",l:"Santo, Santo, Santo es el Senor, Dios del universo."},{t:"Aleluya",l:"Aleluya, aleluya, aleluya."},{t:"Cordero de Dios",l:"Cordero de Dios, que quitas el pecado del mundo, danos la paz."},{t:"Gloria a Dios",l:"Gloria a Dios en el cielo, y en la tierra paz."},{t:"Pescador de Hombres",l:"Tu has venido a la orilla."}];function filtrar(){let q=document.getElementById('busc').value.toLowerCase();let f=canciones.filter(c=>c.t.toLowerCase().includes(q));document.getElementById('lista').innerHTML=f.map(c=>`<div style="padding:12px;cursor:pointer" onclick="ver('${c.t}')"> ${c.t}</div>`).join('');}function ver(t){let c=canciones.find(x=>x.t===t);document.getElementById('detalle').innerHTML='<h2>'+c.t+'</h2><p>'+c.l+'</p>';}filtrar();</script></body></html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cancionero San Francisco - Chillán</title>
+<style>
+*{box-sizing:border-box}
+:root{--azul:#0b1e3a;--azul2:#123a6d;--amarillo:#ffd500;--blanco:#fff}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:radial-gradient(900px 500px at 50% -100px,#1e4a8a 0%,#0b1e3a 55%,#08152b 100%);color:#fff;min-height:100vh}
+header{text-align:center;padding:22px 14px 6px}
+header small{letter-spacing:.18em;font-size:11px;opacity:.85;font-weight:700}
+header h1{font-size:44px;margin:6px 0 0;line-height:1}
+.top{max-width:760px;margin:0 auto;padding:14px}
+.heroBtn{display:block;background:var(--amarillo);color:#111;text-align:center;padding:18px 14px;border-radius:14px;font-weight:900;font-size:17px;text-decoration:none;box-shadow:0 10px 24px rgba(0,0,0,.35);margin:12px 0}
+.heroBtn small{display:block;font-weight:700;font-size:11px;opacity:.7}
+.card{background:rgba(255,255,255,.96);color:#111;border-radius:18px;padding:14px;box-shadow:0 12px 30px rgba(0,0,0,.25)}
+.search{display:flex;gap:8px}
+.search input{flex:1;padding:14px;border-radius:12px;border:1px solid #ddd;font-size:16px;outline:none}
+.search button{padding:0 16px;border-radius:12px;border:none;background:#111;color:#fff;font-weight:800}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.chips button{padding:8px 12px;border-radius:999px;border:1px solid #ddd;background:#fff;cursor:pointer;font-weight:700}
+.chips button.sel{background:#111;color:#fff}
+.count{font-size:13px;color:#666;margin:6px 2px}
+.list{max-height:420px;overflow:auto}
+.item{padding:13px 10px;border-bottom:1px solid #eee;cursor:pointer;display:flex;justify-content:space-between;gap:10px}
+.item:last-child{border-bottom:none}
+.item b{font-size:15px}
+.item span{font-size:12px;background:#eef2ff;color:#1e3a8a;padding:4px 8px;border-radius:999px;white-space:nowrap}
+.item:hover{background:#fffbe6}
+.detalle{margin-top:14px}
+.detalle h2{margin:4px 0}
+.detalle .cat{font-size:12px;font-weight:800;letter-spacing:.1em;color:#8a6d00}
+.detalle pre{white-space:pre-wrap;font-family:inherit;font-size:16px;line-height:1.65;margin:10px 0}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.tools button{padding:10px 12px;border-radius:10px;border:1px solid #ddd;background:#fff;font-weight:800;cursor:pointer}
+.tools button.primary{background:var(--amarillo);border-color:var(--amarillo)}
+footer{text-align:center;padding:16px;font-size:12px;opacity:.7}
+@media(max-width:520px){header h1{font-size:36px}}
+</style>
+</head>
+<body>
+<header><small>SAN FRANCISCO DE ASIS - CHILLÁN</small><h1>Cancionero</h1><p style="opacity:.8;margin:6px 0">Misa • Rosario • Coro • Comunidad</p></header>
+<div class="top">
+<a class="heroBtn" href="rosario.html">IR AL SANTO ROSARIO CON VOZ<small>Toca aquí para rezar con voz y guía</small></a>
+
+<div class="card">
+<div class="search"><input id="busc" placeholder="Buscar canción... Ej: Santo, Aleluya, Pescador" oninput="render()"><button onclick="document.getElementById('busc').value='';render()">✕</button></div>
+<div class="chips" id="chips"></div>
+<div class="count" id="count"></div>
+<div class="list" id="lista"></div>
+</div>
+
+<div class="card detalle" id="detalle">
+<div class="cat">TOCA UNA CANCIÓN PARA VER SU LETRA</div>
+<h2>Bienvenido</h2>
+<p>Este es el cancionero oficial de la comunidad. Busca por nombre o por categoría: Entrada, Gloria, Aleluya, Ofertorio, Santo, Cordero, Comunión, Salida, María, Espíritu Santo y más.</p>
+<p><b>Tip:</b> Toca ⭐ para guardar tus favoritas. Se guardan en tu celular aunque cierres la página.</p>
+</div>
+<footer>Parroquia San Francisco de Asís • Chillán, Chile • Hecho con fe para la comunidad</footer>
+</div>
+
+<script>
+const CATS=["Todas","Favoritas","Entrada","Gloria","Aleluya","Ofertorio","Santo","Cordero","Comunión","Salida","María","Espíritu Santo","Cuaresma","Pascua","Navidad"];
+let catActual="Todas";
+let favs=JSON.parse(localStorage.getItem("fav_cancionero")||"[]");
+let font=16;
+const S=[
+{c:"Entrada",t:"Pescador de Hombres",l:`Tú has venido a la orilla,
+no has buscado ni a sabios ni a ricos,
+tan sólo quieres que yo te siga.
+
+Señor, me has mirado a los ojos,
+sonriendo has dicho mi nombre,
+en la arena he dejado mi barca,
+junto a Ti buscaré otro mar.`},
+{c:"Entrada",t:"Juntos Como Hermanos",l:`Juntos como hermanos,
+miembros de una Iglesia,
+vamos caminando
+al encuentro del Señor.
+
+Un largo caminar, por el desierto bajo el sol,
+no podemos avanzar sin la ayuda del Señor.`},
+{c:"Entrada",t:"Ven, Espíritu de Dios",l:`Ven, Espíritu de Dios,
+llena mi vida de tu amor,
+ven, Espíritu de Dios,
+hazme de nuevo nacer.
+
+Ven a mi vida, ven a mi corazón,
+ven Espíritu Santo, ven.`},
+{c:"Entrada",t:"Alabaré",l:`Alabaré, alabaré,
+alabaré, alabaré,
+alabaré a mi Señor.
+
+Juan vio el número
+de los redimidos,
+y todos alababan al Señor.`},
+{c:"Entrada",t:"El Señor Es Mi Pastor",l:`El Señor es mi pastor,
+nada me falta,
+el Señor es mi pastor,
+nada me faltará.`},
+{c:"Gloria",t:"Gloria a Dios",l:`Gloria a Dios en el cielo,
+y en la tierra paz a los hombres
+que ama el Señor.
+
+Por tu inmensa gloria
+te alabamos, te bendecimos,
+te adoramos, te glorificamos,
+te damos gracias Señor Dios, Rey celestial.`},
+{c:"Gloria",t:"Gloria - Misa Criolla",l:`Gloria a Dios en las alturas,
+y en la tierra paz a los hombres,
+paz a los hombres que ama el Señor.`},
+{c:"Aleluya",t:"Aleluya",l:`Aleluya, aleluya,
+aleluya, aleluya,
+aleluya, aleluya,
+aleluya.
+
+El Señor resucitó,
+cantemos con alegría.`},
+{c:"Aleluya",t:"Aleluya, Cristo Vive",l:`Aleluya, Cristo vive,
+la muerte ya venció,
+aleluya, cantemos todos,
+Jesús resucitó.`},
+{c:"Ofertorio",t:"Te Presentamos",l:`Te presentamos el vino y el pan,
+bendito seas por siempre Señor.
+
+Bendito seas Señor,
+por este pan que nos diste,
+fruto de la tierra y del trabajo de los hombres.`},
+{c:"Ofertorio",t:"Ofertorio - Pan y Vino",l:`Pan y vino ofrecemos,
+fruto de nuestro trabajo,
+acéptalos Señor,
+como ofrenda de amor.`},
+{c:"Ofertorio",t:"Con El Vino y Con El Pan",l:`Con el vino y con el pan
+te ofrecemos Señor,
+nuestra vida, nuestro amor,
+todo lo que somos.`},
+{c:"Santo",t:"Santo, Santo, Santo",l:`Santo, Santo, Santo es el Señor,
+Dios del universo.
+Llenos están el cielo y la tierra de tu gloria.
+Hosanna en el cielo.
+Bendito el que viene en nombre del Señor.
+Hosanna en el cielo.`},
+{c:"Santo",t:"Santo - Hosanna",l:`Santo es el Señor,
+santo es el Señor,
+Dios del universo,
+santo es el Señor.
+
+Hosanna, hosanna,
+hosanna en el cielo.`},
+{c:"Cordero",t:"Cordero de Dios",l:`Cordero de Dios,
+que quitas el pecado del mundo,
+ten piedad de nosotros.
+
+Cordero de Dios,
+que quitas el pecado del mundo,
+ten piedad de nosotros.
+
+Cordero de Dios,
+que quitas el pecado del mundo,
+danos la paz.`},
+{c:"Comunión",t:"Alma Misionera",l:`Señor, toma mi vida nueva,
+antes de que la espera
+desgaste años en mí.
+
+Estoy dispuesto a lo que quieras,
+no importa lo que sea,
+Tú llámame a servir.`},
+{c:"Comunión",t:"Pan de Vida",l:`Pan de vida, cuerpo del Señor,
+pan que nos das en comunión,
+eres vida, eres amor,
+quédate Señor en mi corazón.`},
+{c:"Comunión",t:"Yo Soy El Pan de Vida",l:`Yo soy el pan de vida,
+el que viene a Mí no tendrá hambre,
+el que cree en Mí no tendrá sed,
+nadie viene al Padre sino por Mí.`},
+{c:"Comunión",t:"En Tu Presencia",l:`En tu presencia, Señor,
+quiero estar,
+en tu presencia, Señor,
+quiero adorar.
+
+Santo, santo, santo eres Tú,
+digno de toda alabanza.`},
+{c:"Comunión",t:"Tú Eres Mi Amigo",l:`Tú eres mi amigo,
+Jesús, mi amigo,
+caminas conmigo
+a donde yo voy.`},
+{c:"Comunión",t:"La Eucaristía",l:`La Eucaristía es el banquete,
+donde Jesús se queda con nosotros,
+pan de vida, vino de amor,
+compartamos todos en comunión.`},
+{c:"Salida",t:"María, Madre Mía",l:`María, madre mía,
+no me dejes, no me dejes,
+María, madre mía,
+llévame a Jesús.`},
+{c:"Salida",t:"Id y Enseñad",l:`Id y enseñad a todas las naciones,
+bautizándolas en el nombre del Padre,
+del Hijo y del Espíritu Santo.
+Yo estaré con vosotros todos los días.`},
+{c:"Salida",t:"Canta Alegría",l:`Canta alegría, canta con el corazón,
+que Cristo ha resucitado,
+canta alegría, canta con el corazón.`},
+{c:"María",t:"Ave María",l:`Dios te salve María,
+llena eres de gracia,
+el Señor es contigo,
+bendita Tú eres entre todas las mujeres,
+y bendito es el fruto de tu vientre, Jesús.
+
+Santa María, Madre de Dios,
+ruega por nosotros, pecadores,
+ahora y en la hora de nuestra muerte. Amén.`},
+{c:"María",t:"Madre del Salvador",l:`Madre del Salvador,
+Ruega por nosotros,
+Madre del Redentor,
+Ruega por nosotros.`},
+{c:"María",t:"Dios Te Salve, María",l:`Dios te salve, María,
+Madre de Dios y Madre nuestra,
+llena de gracia, el Señor es contigo.`},
+{c:"María",t:"Virgen de la Merced",l:`Virgen de la Merced,
+Madre de misericordia,
+ruega por nosotros,
+cuida a tus hijos.`},
+{c:"María",t:"La Guadalupana",l:`Desde el cielo una hermosa mañana,
+la Guadalupana bajó al Tepeyac,
+suplicante juntaba sus manos,
+y era mexicano su porte y su faz.`},
+{c:"Espíritu Santo",t:"Ven, Espíritu Santo",l:`Ven, Espíritu Santo,
+ven, ven, ven,
+llena mi corazón,
+ven, ven, ven.
+
+Ven a iluminar,
+ven a consolar,
+ven Espíritu Santo.`},
+{c:"Espíritu Santo",t:"Espíritu Santo, Ven",l:`Espíritu Santo, ven,
+Espíritu Santo, ven,
+desciende sobre nosotros,
+Espíritu Santo, ven.`},
+{c:"Cuaresma",t:"Perdón, Señor",l:`Perdón, Señor, perdón,
+por mis pecados, perdón,
+perdón, Señor, perdón,
+ten piedad de mí.`},
+{c:"Cuaresma",t:"Camino de la Cruz",l:`Camino de la Cruz,
+Jesús cargó con mi dolor,
+camino de la Cruz,
+por amor me salvó.`},
+{c:"Pascua",t:"Cristo Resucitó",l:`Cristo resucitó,
+verdaderamente resucitó,
+aleluya, aleluya,
+cantemos al Señor.`},
+{c:"Pascua",t:"El Señor Resucitó",l:`El Señor resucitó,
+la muerte ya no tiene poder,
+el Señor resucitó,
+cantemos con alegría.`},
+{c:"Navidad",t:"Noche de Paz",l:`Noche de paz, noche de amor,
+todo duerme en derredor,
+entre los astros que esparcen su luz,
+bella anunciando al niñito Jesús,
+brilla la estrella de paz,
+brilla la estrella de paz.`},
+{c:"Navidad",t:"Villancico - Campana Sobre Campana",l:`Campana sobre campana,
+y sobre campana una,
+asómate a la ventana,
+verás al Niño en la cuna.
+
+Belén, campanas de Belén,
+que los ángeles tocan,
+¿qué nuevas me traéis?`},
+{c:"Navidad",t:"Los Peces En El Río",l:`Pero mira cómo beben
+los peces en el río,
+pero mira cómo beben
+por ver a Dios nacido.
+
+Beben y beben y vuelven a beber,
+los peces en el río
+por ver a Dios nacer.`},
+{c:"Entrada",t:"Himno a San Francisco",l:`San Francisco de Asís,
+hombre de paz y de amor,
+enséñanos a seguir
+el camino del Señor.
+
+Hazme un instrumento de tu paz,
+donde haya odio, que yo ponga amor,
+donde haya ofensa, que yo ponga perdón.`},
+{c:"Salida",t:"Hazme Un Instrumento",l:`Hazme un instrumento de tu paz,
+donde haya odio, lleve yo tu amor,
+donde haya injuria, tu perdón, Señor,
+donde haya duda, fe en Ti.
+
+Maestro, ayúdame a nunca buscar,
+el ser consolado como consolar,
+ser comprendido como comprender,
+ser amado como yo amar.`},
+{c:"Comunión",t:"Dios Está Aquí",l:`Dios está aquí,
+tan cierto como el aire que respiro,
+tan cierto como la mañana se levanta,
+tan cierto como que este canto lo puedes oír.`}
+];
+
+function renderChips(){
+  document.getElementById('chips').innerHTML=CATS.map(c=>`<button class="${c===catActual?'sel':''}" onclick="setCat('${c}')">${c}</button>`).join('');
+}
+function setCat(c){catActual=c;renderChips();render();}
+function filtradas(){
+  let q=document.getElementById('busc').value.toLowerCase().trim();
+  return S.filter(s=>{
+    let okCat = catActual==="Todas" ? true : catActual==="Favoritas" ? favs.includes(s.t) : s.c===catActual;
+    let okQ = !q || s.t.toLowerCase().includes(q) || s.c.toLowerCase().includes(q) || s.l.toLowerCase().includes(q);
+    return okCat && okQ;
+  });
+}
+function render(){
+  let f=filtradas();
+  document.getElementById('count').textContent=f.length+" canciones • Toca una para ver la letra • ⭐ para favorita";
+  document.getElementById('lista').innerHTML=f.map(s=>{
+    let fav=favs.includes(s.t)?"⭐":"☆";
+    return `<div class="item" onclick="ver('${s.t.replace(/'/g,"\\'")}')"><b>${s.t}</b><span>${s.c} • ${fav}</span></div>`;
+  }).join('') || "<p style='padding:12px'>No hay canciones con ese filtro. Prueba otra palabra.</p>";
+}
+function ver(t){
+  let s=S.find(x=>x.t===t);
+  if(!s) return;
+  let esFav=favs.includes(t);
+  document.getElementById('detalle').innerHTML=`
+  <div class="cat">${s.c.toUpperCase()} • SAN FRANCISCO DE ASÍS</div>
+  <h2>${s.t}</h2>
+  <div class="tools">
+    <button class="primary" onclick="hablar('${t.replace(/'/g,"\\'")}')">🔊 Escuchar letra</button>
+    <button onclick="toggleFav('${t.replace(/'/g,"\\'")}')">${esFav?'⭐ Quitar de favoritas':'☆ Guardar favorita'}</button>
+    <button onclick="cambiarFont(2)">A+ Más grande</button>
+    <button onclick="cambiarFont(-2)">A- Más chica</button>
+    <button onclick="copiar('${t.replace(/'/g,"\\'")}')">📋 Copiar</button>
+  </div>
+  <pre id="letra" style="font-size:${font}px">${s.l}</pre>
+  <p style="font-size:13px;color:#666">¿Te sabes otra versión? Díselo al coro para agregarla.</p>`;
+  document.getElementById('detalle').scrollIntoView({behavior:'smooth'});
+}
+function toggleFav(t){
+  if(favs.includes(t)) favs=favs.filter(x=>x!==t); else favs.push(t);
+  localStorage.setItem("fav_cancionero",JSON.stringify(favs));
+  render(); ver(t);
+}
+function cambiarFont(d){font=Math.max(13,Math.min(28,font+d)); let p=document.getElementById('letra'); if(p) p.style.fontSize=font+"px";}
+function hablar(t){
+  let s=S.find(x=>x.t===t); if(!s) return;
+  speechSynthesis.cancel();
+  let u=new SpeechSynthesisUtterance(s.t+". "+s.l);
+  u.lang="es-CL"; u.rate=0.95; speechSynthesis.speak(u);
+}
+function copiar(t){
+  let s=S.find(x=>x.t===t); navigator.clipboard.writeText(s.t+"\n\n"+s.l).then(()=>alert("¡Copiada! Ya la puedes pegar en WhatsApp"));
+}
+renderChips(); render();
+</script>
+</body>
+</html>
